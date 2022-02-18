@@ -1,23 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import Header from './components/Header';
+import Input from './components/Input';
+import QRCode from './components/QRCode';
 
 function App() {
+  const [text, setText] = useState('');
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchQR = async () => {
+      const res = await fetch(
+        `https://api.qrserver.com/v1/create-qr-code/?data=${
+          text || 'Enter'
+        }&size=200x200`
+      );
+      const data = await res;
+      setUrl(data.url);
+      setIsLoading(false);
+    };
+    fetchQR();
+  }, [text]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <Input text={text} onEnterText={setText} />
+      <QRCode isLoading={isLoading} url={url} />
     </div>
   );
 }
